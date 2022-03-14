@@ -1,0 +1,68 @@
+#입력받기
+n,m = map(int,input())
+graph =[]
+for _ in range(n):
+    graph.append(list(map(int,input().split())))
+
+#종이의 각 칸에서 블록을 4개 선택할 때 까지 탐색하며 총합이 최대가 될 때 answer을 교체함
+def dfs(x,y,index,total) : #이전 값을 받아야 하기 때문에 total필요
+    global answer # 이전 실행까지 최대값을 answer에 저장
+    
+    if answer >= total + max_val * (3-index): #남은칸을 모두 종이내 최대값으로 골라도 answer을 교체할 수 없으면 조기종료 
+        return
+    #블럭 네 칸을 모두 골랐을 때
+    if index == 3 :
+        answer = max(answer,total) # 만약 total이 이전 최대값 보다 크면 전환
+        return
+        
+    else :
+        dx = [0, 0, 1, -1]
+        dy = [1, -1, 0, 0]
+        for i in range(4):
+            nx = x + dx[i]
+            ny = y + dy[i]
+            if nx <0 or nx >= n or ny <0 or ny >= m : continue
+            if visited[nx][ny] == 0: #방문하지 않은 곳만 탐색
+                if index == 1:  # 2칸까지 잡았을때만.
+                    visited[nx][ny] = 1  # 방문처리
+                    dfs(x, y, index + 1, total + graph[nx][ny])  # ㅗ 모양까지 잡아주기 위해서 재자리에서 탐색해줌
+                    visited[nx][ny] = 0
+                    
+                visited[nx][ny] = 1  # 아래 bfs가 실행 될 때는 nxny가 방문 된 상태
+                dfs(nx, ny, index + 1, total + graph[nx][ny])
+                visited[nx][ny] = 0 # 실행이 끝나고 방문처리를 제거해줘야 반복 수행 가능함
+
+
+visited = [[0] * m for _ in range(n)]
+answer = 0
+max_val = max(map(max,graph))
+
+#종이의 모든 값에 대해 실행
+for i in range(n):
+    for j  in range(m):
+        visited[i][j] = 1
+        dfs(i,j,0,graph[i][j])
+        visited[i][j] = 0
+
+print(answer)
+
+
+
+
+
+
+
+##문제의 쟁점
+- 인접한 네 칸을 찾아야함 
+ => 길이가 미리 정해진 탐색은 dfs가 적절함 (거리가 정해져있고 경로를 찾는다.)
+ => 반대로 최단거리를 찾을 때는 bfs가 적절함 (거리를 찾는다.)
+ 
+-  ㅗ 모양은 다른 모양과 별개로 처리해줄 필요가 있다.
+ => 2칸을 골랐을 때, 탐색 시작 위치를 자기 자신으로 하여 재귀함수를 실행하여 ㅗ 모양도 탐색 가능토록 한다.
+ 
+ 
+ ## 배운점
+ - dfs와 bfs의 유형 구분점
+ - dfs에서 방문 처리 팁
+  => 재귀함수 실행 전과 후에 방문 처리를 키고 끔으로 써 다양한 경로를 탐색할 수 있음
+  

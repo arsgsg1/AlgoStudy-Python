@@ -1,4 +1,6 @@
 ## 떡 먹는 호랑이
+![image](https://user-images.githubusercontent.com/25299428/158106448-9bbc320d-5cb1-452f-b9ef-d985104062b3.png)
+
 ### 문제 접근
 1. 첫째날과 둘째날의 떡 개수를 변화시키면서 dp를 적용시킬 수 있음
 2. dp[i] = i번째 날에 준 떡 개수, dp[i] = dp[i - 1] + dp[i - 2]

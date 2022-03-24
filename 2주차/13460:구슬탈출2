@@ -1,0 +1,95 @@
+from collections import deque
+n,m = map(int,input().split())
+graph = []
+for i in range(n):
+    graph.append(list(input()))
+
+# 벽과 구멍 위치 찾기
+for i in range(n):
+    for j in range(m):
+        if graph[i][j] == "R":
+            red = (i,j)
+        elif graph[i][j] == "B":
+            blue = (i,j)
+
+
+dx = [1, -1, 0, 0]
+dy = [0, 0, 1, -1]
+def bfs(x1,y1,x2,y2) : #레드와 블루의 위치
+    q = deque()
+    q.append((x1,y1,x2,y2,0))  #몇번 움직였는지도 꼭 체크해줌
+    visited = []
+    visited.append((x1,y1,x2,y2)) #방문처리
+    while q :
+        x1, y1, x2, y2,count = q.popleft()
+        # 10번넘어가면 초과
+        if count > 10:
+            print(-1)
+            return
+        # 끝내는 상황/ 블루가 먼저 홀에 들어가는 예외상황은 이동 전에 체크해서 미리 제거시켜줌
+        if graph[x1][y1] == "O":
+            print(count)
+            return
+        # 이동탐색
+        for i in range(4):
+            # 빨간색 공 먼저 이동
+            nx1, ny1 = x1, y1
+            while True:  # 벽이나 구멍때 까지
+                nx1 += dx[i]
+                ny1 += dy[i]
+                if graph[nx1][ny1] == "#":  # 만약 벽이면 한칸 전으로 옮겨서 위치 고정
+                    nx1 -= dx[i]
+                    ny1 -= dy[i]
+                    break
+                if graph[nx1][ny1] == "O":  # 만약 구멍이었으면 그냥 끝
+                    break
+            # 파란색 공 이동
+            nx2, ny2 = x2, y2
+            while True:
+                nx2 += dx[i]
+                ny2 += dy[i]
+                if graph[nx2][ny2] == "#":
+                    nx2 -= dx[i]
+                    ny2 -= dy[i]
+                    break
+                if graph[nx2][ny2] == "O":
+                    break
+
+            # 예외상황
+            if graph[nx2][ny2] == "O":  # 블루가 먼저 들어갈 경우
+                continue  # 한턴 넘김
+
+            # 위치 체크
+            if nx1 == nx2 and ny1 == ny2:
+                if abs(nx1 - x1) + abs(ny1 - y1) > abs(nx2 - x2) + abs(ny2 - y2):  # 양쪽 중 많이 움직인 쪽이 있다면
+                    nx1 -= dx[i]
+                    ny1 -= dy[i]  # 한칸 뒤로 뻄
+                else:
+                    nx2 -= dx[i]
+                    ny2 -= dy[i]  # 한칸 뒤로 뻄
+
+            # 이동
+            if (nx1, ny1, nx2, ny2) not in visited:  # 방문한적 없는 곳이라면
+                q.append((nx1, ny1, nx2, ny2, count+1))  # 큐에 넣고
+                visited.append((nx1, ny1, nx2, ny2))  # 방문처리
+    print(-1)
+    return
+
+
+bfs(red[0],red[1],blue[0],blue[1])
+
+
+
+
+##쟁점 
+- 예외처리가 매우 많음
+- 움직여야하는 돌이 2개임
+ =>각각 같이 움직인 후에 움직인 거리에 따라서 두 돌의 위치를 재정비 해줌 
+ => 빨간돌이 더 많이 움직였을 때는 빨간돌을 한칸 되돌려줌, 파란돌도 마찬가지
+##배운점
+- 이동할 위치 탐색 찾기 -> 이동할 위치의 적합성 판정(예외인지 아닌지) -> 이동 , 횟수 +1 
+ => 복잡하지만 실수 없이 구현 가능
+- 최소거리를 찾을 때 상한 값 설정 가능
+ => 최소거리를 찾되 탐색 횟수가 10번이 넘어가면 -1 반환과 같은 예외 처리 가능
+- 방문처리
+ => 굳이 용량을 먹으면서 방문처리 할 필요 없고, 빈 객체에다가 방문한 곳을 담아주면 

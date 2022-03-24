@@ -1,0 +1,24 @@
+import heapq
+n=int(input())
+data=[]
+for i in range(n):
+  data.append(list(map(int, input().split())))
+
+data.sort(key=lambda x: (x[1]))
+p_list=[]
+for i in data:
+    heapq.heappush(p_list, i[0])
+    if (len(p_list)>i[1]):
+        heapq.heappop(p_list)  #그날짜보다 과도하게 들어오면 그만큼 빼준다.
+
+print(sum(p_list))
+
+
+#쟁점
+- dp로 풀것인가 그리디알고리즘으로 풀것인가
+-dp : 순회일정중 가장 늦을 일정을 기준으로 하루씩 줄여가면서 최고 강연비를 계산할 수 있음
+     => 하지만 부분 계산이 계속 사용되지 않음 + 불필요한 계산이 많아짐
+-그리디 : 힙큐 자료구조 사용하면 쉬움
+    => 날짜 순으로 정렬한 후 선택된 대학 강연을 힙큐에 포함시켜줌
+    => 힙큐의 길이가 강연날짜보다 길어질 경우 강연비가 가장 적은 강연을 뺌 (계속해서 작은 강연을 빼는 것)
+
